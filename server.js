@@ -1,11 +1,11 @@
 import 'dotenv/config'
-import crypto from 'node:crypto'
 import express from 'express'
 import ExcelJS from 'exceljs'
 import { access, mkdir } from 'node:fs/promises'
 import Razorpay from 'razorpay'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { isValidPaymentSignature, normalizeCustomer } from './lib/payment-utils.js'
 
 const keyId = process.env.RAZORPAY_KEY_ID
 const keySecret = process.env.RAZORPAY_KEY_SECRET
@@ -112,55 +112,30 @@ app.post('/api/verify-payment', async (request, response) => {
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-    customer,
   } = request.body ?? {}
   if (
     typeof razorpay_order_id !== 'string' ||
     typeof razorpay_payment_id !== 'string' ||
     typeof razorpay_signature !== 'string' ||
     !razorpay_order_id ||
-    !razorpay_payment_id ||
-    !/^[a-f\d]{64}$/i.test(razorpay_signature) ||
-    typeof customer?.name !== 'string' ||
-    typeof customer?.email !== 'string' ||
-    typeof customer?.contact !== 'string'
+    !razorpay_payment_id
   ) {
     return response.status(400).json({ error: 'Payment verification fields are required.' })
   }
 
-  const name = customer.name.trim()
-  const email = customer.email.trim()
-  const contact = customer.contact.trim()
-  if (
-    !name ||
-    name.length > 100 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-    email.length > 254 ||
-    !/^[+()\d -]{7,20}$/.test(contact)
-  ) {
+  const customer = normalizeCustomer(request.body.customer)
+  if (!customer) {
     return response.status(400).json({ error: 'Customer details are invalid.' })
   }
 
-  const expectedSignature = crypto
-    .createHmac('sha256', keySecret)
-    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-    .digest('hex')
-  const expected = Buffer.from(expectedSignature)
-  const received = Buffer.from(razorpay_signature)
-
-  if (
-    expected.length !== received.length ||
-    !crypto.timingSafeEqual(expected, received)
-  ) {
+  if (!isValidPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature, keySecret)) {
     return response.status(400).json({ error: 'Payment signature did not match.' })
   }
 
   const verifiedAt = new Date().toISOString()
   const paymentRecord = {
     verifiedAt,
-    name,
-    email,
-    contact,
+    ...customer,
     amount: amount / 100,
     currency: 'INR',
     orderId: razorpay_order_id,

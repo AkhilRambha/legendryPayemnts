@@ -7,9 +7,11 @@
     "dev": "concurrently -k -n api,web -c blue,green \"node server.js\" \"vite\"",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export:payments": "node scripts/export-payments.js"
   },
   "dependencies": {
+    "@vercel/blob": "^2.9.0",
     "dotenv": "^18.0.10",
     "exceljs": "^4.4.0",
     "express": "^5.3.0",
@@ -26,6 +28,7 @@
     "vite": "^8.3.6"
   },
   "overrides": {
-    "uuid": "11.1.1"
+    "uuid": "11.1.1",
+    "zod": "4.6.7"
   }
 }

@@ -9,13 +9,14 @@
 
 The checkout uses the mode associated with the configured keys. Test keys require Razorpay test payment details. Live keys charge real money, including when running locally.
 
-## Environment variables
+## Deploy on Vercel
 
-The local `.env` file is ignored by Git. Never commit it or put `RAZORPAY_KEY_SECRET` in a `VITE_` variable. For deployment, configure the same variables in your hosting provider's secret environment settings and deploy the API server securely; Vite's development proxy is only for local use.
+1. In Vercel, add `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `VITE_RAZORPAY_KEY_ID`, `PAYMENT_AMOUNT_PAISE`, and `VITE_PAYMENT_AMOUNT_PAISE` under **Project Settings → Environment Variables**. Use matching live credentials for Production; use test credentials for Preview.
+2. In the Vercel project **Storage** tab, create a **private Blob store** and connect it to the project. Vercel supplies the function credentials automatically.
+3. Redeploy after setting the environment variables and connecting storage.
 
-## API
+The root `api/` folder contains Vercel Functions for order creation and payment verification. Verified customer receipts are stored as private Blob records; Vercel's function filesystem is not used for persistent storage.
 
-- `POST /api/create-order` — creates an INR order using the server-configured amount.
-- `POST /api/verify-payment` — verifies the payment signature and saves the verified receipt.
+To export the private receipt records to Excel, connect the Blob store to the project's **Development** environment, then run `npx vercel login`, `npx vercel link`, and `npx vercel env pull .env.local` from this folder. Run `npm run export:payments` to create `data/payments.xlsx` locally. Keep the workbook private and back it up securely.
 
-After a payment signature is verified, a success page is shown and the receipt is stored in `data/payments.xlsx` on the server. It includes customer name, email, phone, amount, order/payment IDs, and verification time. Keep this file private and back it up securely. It does not contain card or bank details. WhatsApp notifications are not configured.
+For local development, the Express API writes verified receipts directly to `data/payments.xlsx`. The workbook includes customer name, email, phone, amount, order/payment IDs, and verification time; it does not contain card or bank details. WhatsApp notifications are not configured.
