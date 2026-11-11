@@ -1,33 +1,27 @@
 import { useState } from 'react'
 import './PaymentSuccess.css'
 
-function PaymentSuccess({ receipt, onStartOver }) {
+function PaymentSuccess({ receipt, onContinueRegistration }) {
   const [showRegistrationDetails, setShowRegistrationDetails] = useState(false)
   const paymentId = receipt.payment_id || receipt.razorpay_payment_id
+  const amountLabel = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: receipt.currency || 'INR',
+  }).format(receipt.amount)
 
   return (
     <main className="payment-success">
       <div className="success-mark" aria-hidden="true">✓</div>
       <p className="eyebrow">PAYMENT COMPLETE</p>
-      <h1>Thank you for your payment</h1>
-      <p className="success-description">
-        Your payment was verified successfully.
-      </p>
-      <div className="receipt-details">
-        <div>
-          <span>Amount paid</span>
-          <strong>₹{Number(receipt.amount).toFixed(2)}</strong>
-        </div>
-        <div>
-          <span>Payment ID</span>
-          <strong className="receipt-id">{paymentId}</strong>
-        </div>
+      <h1>Payment successful!</h1>
+      <p className="success-description">Your booking has been confirmed.</p>
+      <div className="booking-status">
+        <p><span>Booking ID</span><strong>{receipt.booking_id}</strong></p>
+        <p><span>Payment</span><strong className="status-badge verified">Verified</strong></p>
+        <p><span>Attendee registration</span><strong className="status-badge pending">Pending</strong></p>
+        <p><span>Amount paid</span><strong>{amountLabel}</strong></p>
+        <p><span>Payment ID</span><strong className="receipt-id">{paymentId}</strong></p>
       </div>
-      {receipt.warning ? (
-        <p className="receipt-warning" role="alert">{receipt.warning}</p>
-      ) : (
-        <p className="receipt-saved">Your receipt has been saved.</p>
-      )}
       <button
         className="details-toggle"
         type="button"
@@ -45,9 +39,12 @@ function PaymentSuccess({ receipt, onStartOver }) {
           <p><span>Phone</span><strong>{receipt.customer.contact}</strong></p>
         </div>
       )}
-      <button className="pay-button" type="button" onClick={onStartOver}>
-        Done
+      <button className="pay-button" type="button" onClick={onContinueRegistration}>
+        Continue to Attendee Registration <span aria-hidden="true">→</span>
       </button>
+      <p className="registration-note">
+        Add up to {receipt.attendee_limit} attendee names for this booking.
+      </p>
     </main>
   )
 }

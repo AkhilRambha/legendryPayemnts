@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './PaymentCheckout.css'
 import PaymentSuccess from './PaymentSuccess.jsx'
+import AttendeeRegistration from './AttendeeRegistration.jsx'
 
 const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID
 const amountPaise = Number(import.meta.env.VITE_PAYMENT_AMOUNT_PAISE)
@@ -10,25 +11,12 @@ const amountLabel = new Intl.NumberFormat('en-IN', {
   maximumFractionDigits: 2,
 }).format(amountPaise / 100)
 
-async function readApiResponse(response) {
-  if (!response.headers.get('content-type')?.includes('application/json')) {
-    throw new Error(
-      `Payment API returned an unexpected response (HTTP ${response.status}). Check the Vercel function logs.`,
-    )
-  }
-
-  try {
-    return await response.json()
-  } catch {
-    throw new Error('Payment API returned invalid JSON. Check the Vercel function logs.')
-  }
-}
-
 function PaymentCheckout() {
   const [status, setStatus] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [showDetailsForm, setShowDetailsForm] = useState(false)
   const [receipt, setReceipt] = useState(null)
+  const [stage, setStage] = useState('checkout')
 
   function openDetailsForm() {
     setStatus('')
@@ -37,6 +25,7 @@ function PaymentCheckout() {
 
   function startOver() {
     setReceipt(null)
+    setStage('checkout')
     setShowDetailsForm(false)
     setStatus('')
   }
@@ -61,9 +50,9 @@ function PaymentCheckout() {
       const orderResponse = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ customer: { name, email, contact } }),
       })
-      const order = await readApiResponse(orderResponse)
+      const order = await orderResponse.json()
       if (!orderResponse.ok) {
         throw new Error(order.error || 'Could not create a payment order.')
       }
@@ -89,18 +78,18 @@ function PaymentCheckout() {
                 razorpay_payment_id: payment.razorpay_payment_id,
                 razorpay_order_id: payment.razorpay_order_id,
                 razorpay_signature: payment.razorpay_signature,
-                customer: { name, email, contact },
+                registration_token: order.registration_token,
               }),
             })
-            const result = await readApiResponse(verificationResponse)
+            const result = await verificationResponse.json()
             if (!verificationResponse.ok && !result.verified) {
               throw new Error(result.error || 'Payment verification failed.')
             }
             setReceipt({
               ...result,
               customer: { name, email, contact },
-              warning: result.saved ? '' : result.error,
             })
+            setStage('success')
           } catch (error) {
             setStatus(error.message || 'Payment verification failed.')
           } finally {
@@ -127,8 +116,22 @@ function PaymentCheckout() {
     }
   }
 
-  if (receipt) {
-    return <PaymentSuccess receipt={receipt} onStartOver={startOver} />
+  if (receipt && stage === 'success') {
+    return (
+      <PaymentSuccess
+        receipt={receipt}
+        onContinueRegistration={() => setStage('registration')}
+      />
+    )
+  }
+
+  if (receipt && stage === 'registration') {
+    return (
+      <AttendeeRegistration
+        booking={receipt}
+        onStartOver={startOver}
+      />
+    )
   }
 
   return (

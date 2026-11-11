@@ -1,0 +1,172 @@
+.attendee-card {
+  width: min(100% - 40px, 600px);
+  box-sizing: border-box;
+  padding: 32px;
+  border: 1px solid #e8e7ed;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px #31215a14;
+}
+
+.attendee-card h1 {
+  margin: 8px 0;
+  color: #201b32;
+  font-size: clamp(26px, 7vw, 32px);
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.attendee-description {
+  color: #777386;
+  font-size: 14px;
+}
+
+.attendee-description strong {
+  color: #5140bc;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.attendee-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 18px;
+}
+
+.attendee-section-heading h2 {
+  margin: 0;
+  color: #211b36;
+  font-size: 18px;
+}
+
+.attendee-section-heading > span {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #f0eff2;
+  color: #5f5b69;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.attendee-form {
+  display: grid;
+  gap: 17px;
+}
+
+.attendee-field {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+.attendee-field-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #514d60;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.attendee-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 15px;
+  border: 1px solid #dedce6;
+  border-radius: 999px;
+  background: #fff;
+  color: #201b32;
+  font: inherit;
+  font-size: 15px;
+}
+
+.attendee-field input:focus {
+  border-color: #6d4aff;
+  outline: 3px solid #6d4aff2b;
+}
+
+.remove-attendee {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #706c7e;
+  cursor: pointer;
+  font: inherit;
+  font-size: 22px;
+}
+
+.remove-attendee:hover {
+  background: #f4f2fb;
+}
+
+.add-attendee {
+  min-height: 46px;
+  border: 1px dashed #c9c4d7;
+  border-radius: 999px;
+  background: #fff;
+  color: #5140bc;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.add-attendee:hover {
+  background: #f7f5ff;
+}
+
+.attendee-error {
+  color: #a54121;
+  font-size: 14px;
+}
+
+.issued-tickets {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.issued-tickets + .pay-button,
+.attendee-error + .pay-button {
+  margin-bottom: 12px;
+}
+
+.issued-ticket {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid #eeedf2;
+  border-radius: 14px;
+  text-align: left;
+}
+
+.issued-ticket > div {
+  display: grid;
+  gap: 6px;
+}
+
+.issued-ticket span,
+.issued-ticket small {
+  color: #777386;
+  font-size: 12px;
+}
+
+.issued-ticket strong {
+  color: #211b36;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .attendee-card {
+    padding: 24px 20px;
+  }
+
+  .issued-ticket {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,7 +1,7 @@
 .payment-success {
-  width: min(100% - 40px, 430px);
+  width: min(100% - 40px, 600px);
   box-sizing: border-box;
-  padding: 42px;
+  padding: 32px;
   border: 1px solid #e8e7ed;
   border-radius: 22px;
   background: #fff;
@@ -10,73 +10,71 @@
 
 .success-mark {
   display: grid;
-  width: 58px;
-  height: 58px;
-  margin: 0 auto 22px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
   place-items: center;
   border-radius: 50%;
   background: #e7f8ef;
   color: #18864b;
-  font-size: 32px;
+  font-size: 27px;
   font-weight: 700;
 }
 
 .payment-success h1 {
-  margin: 10px 0;
+  margin: 8px 0;
   color: #201b32;
-  font-size: clamp(26px, 7vw, 34px);
+  font-size: clamp(26px, 7vw, 32px);
   letter-spacing: -1px;
   line-height: 1.2;
 }
 
 .success-description {
   color: #777386;
-  font-size: 15px;
-}
-
-.receipt-details {
-  display: grid;
-  gap: 14px;
-  margin: 26px 0 18px;
-  padding: 18px;
-  border: 1px solid #eeedf2;
-  border-radius: 12px;
-  text-align: left;
-}
-
-.receipt-details div {
-  display: grid;
-  gap: 4px;
-}
-
-.receipt-details span {
-  color: #777386;
-  font-size: 13px;
-}
-
-.receipt-details strong {
-  color: #211b36;
-  font-size: 16px;
-}
-
-.receipt-details .receipt-id {
-  overflow-wrap: anywhere;
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: 13px;
-}
-
-.receipt-saved,
-.receipt-warning {
-  margin-bottom: 18px;
   font-size: 14px;
 }
 
-.receipt-saved {
+.booking-status {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.booking-status p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  color: #5f5b69;
+  font-size: 14px;
+}
+
+.booking-status p > strong {
+  color: #252136;
+  font-size: 14px;
+  text-align: right;
+}
+
+.booking-status .receipt-id {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 12px;
+}
+
+.status-badge {
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.status-badge.verified {
+  background: #e7f8ef;
   color: #18864b;
 }
 
-.receipt-warning {
-  color: #a54121;
+.status-badge.pending {
+  background: #f0eff2;
+  color: #5f5b69;
 }
 
 .details-toggle {
@@ -135,8 +133,15 @@
   font-weight: 500;
 }
 
+.registration-note {
+  margin-top: 12px;
+  color: #777386;
+  font-size: 12px;
+  text-align: center;
+}
+
 @media (max-width: 480px) {
   .payment-success {
-    padding: 32px 24px;
+    padding: 24px 20px;
   }
 }
