@@ -1,0 +1,137 @@
+.payment-card {
+  width: min(100% - 40px, 430px);
+  box-sizing: border-box;
+  padding: 42px;
+  border: 1px solid #e8e7ed;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px #31215a14;
+}
+
+.brand-mark {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 24px;
+  place-items: center;
+  border-radius: 14px;
+  background: #6d4aff;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.eyebrow {
+  color: #765df3;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+.payment-card h1 {
+  margin: 10px 0;
+  font-size: clamp(28px, 7vw, 36px);
+  letter-spacing: -1.2px;
+  line-height: 1.2;
+}
+
+.description {
+  color: #777386;
+  font-size: 15px;
+}
+
+.amount-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 18px;
+  padding: 18px;
+  border: 1px solid #eeedf2;
+  border-radius: 12px;
+  color: #706c7e;
+  font-size: 14px;
+}
+
+.amount-panel strong {
+  color: #211b36;
+  font-size: 22px;
+}
+
+.pay-button {
+  width: 100%;
+  padding: 15px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #6d4aff;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.pay-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #5939e8;
+}
+
+.pay-button:focus-visible {
+  outline: 3px solid #b8aaff;
+  outline-offset: 3px;
+}
+
+.pay-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.details-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.details-form label {
+  display: grid;
+  gap: 7px;
+  color: #514d60;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.details-form input {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid #dedce6;
+  border-radius: 9px;
+  background: #fff;
+  color: #201b32;
+  font: inherit;
+  font-size: 15px;
+}
+
+.details-form input:focus {
+  border-color: #6d4aff;
+  outline: 3px solid #6d4aff2b;
+}
+
+.secure-note {
+  margin-top: 16px;
+  color: #898696;
+  font-size: 12px;
+}
+
+.status {
+  min-height: 24px;
+  margin-top: 12px;
+  color: #5140bc;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .payment-card {
+    padding: 32px 24px;
+  }
+}
