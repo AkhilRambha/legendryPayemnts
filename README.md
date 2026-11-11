@@ -1,22 +1,45 @@
-# Razorpay Standard Checkout
+# Legendary Business Awards Checkout
 
-## Run locally
+## Local setup
 
-1. Set your matching Razorpay Key ID and Key Secret in `.env`; keep the Secret out of all `VITE_` variables. The `.env` file is ignored by Git.
-2. Set `PAYMENT_AMOUNT_PAISE=10000` for a ₹100 payment, or change it to another amount of at least 100 paise. The server controls the actual order amount.
-3. Run `npm run dev` from this folder.
-4. Open the Vite URL printed in the terminal (usually `http://localhost:5173`), click **Continue**, fill in the required details, then click **Continue to payment**.
+1. Create a Firebase project and enable Cloud Firestore.
+2. In Firebase Console → Firestore Database → Rules, publish the contents of `firestore.rules`.
+3. Create a Firebase service account for the server and download its JSON key. For local development, put the file in the project root as `firebase-service-account.json`; Git ignores this filename.
+4. Add `FIREBASE_PROJECT_ID` and `FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json` to your existing `.env`. You do not need to copy the JSON contents. For Vercel, use the `FIREBASE_SERVICE_ACCOUNT_JSON` environment variable instead, because the local key file is not deployed.
+5. Copy any other missing settings from `.env.example` into `.env`. Never expose the Firebase service-account JSON or Razorpay secret in a `VITE_` variable.
+6. Run `npm run dev`, then open the Vite URL printed in the terminal.
+7. Continue through checkout, complete a Razorpay payment, then use **Continue to Attendee Registration** to add up to four attendee names and issue their QR tickets.
 
-The checkout uses the mode associated with the configured keys. Test keys require Razorpay test payment details. Live keys charge real money, including when running locally.
+Use Razorpay test credentials and test payment details while developing. Live credentials charge real money, including on localhost.
 
-## Deploy on Vercel
+## Firebase configuration
 
-1. In Vercel, add `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `VITE_RAZORPAY_KEY_ID`, `PAYMENT_AMOUNT_PAISE`, and `VITE_PAYMENT_AMOUNT_PAISE` under **Project Settings → Environment Variables**. Use matching live credentials for Production; use test credentials for Preview.
-2. In the Vercel project **Storage** tab, create a **private Blob store** and connect it to the project. Vercel supplies the function credentials automatically.
-3. Redeploy after setting the environment variables and connecting storage.
+Set these server environment variables locally in `.env` and in Vercel Project Settings → Environment Variables:
 
-The root `api/` folder contains Vercel Functions for order creation and payment verification. Verified customer receipts are stored as private Blob records; Vercel's function filesystem is not used for persistent storage.
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_DATABASE_ID` — defaults to `default`, matching the Firebase database created for this project.
+- `FIREBASE_SERVICE_ACCOUNT_JSON` — the service account JSON as one environment-variable value; never commit or share it.
+- `ATTENDEE_LIMIT` — maximum attendees per booking (defaults to `4`, including the main attendee).
+- `BOOKING_ID_PREFIX` — defaults to `LBA26`.
+- `EVENT_NAME` — defaults to `Legendary Business Awards 2026`.
 
-To export the private receipt records to Excel, connect the Blob store to the project's **Development** environment, then run `npx vercel login`, `npx vercel link`, and `npx vercel env pull .env.local` from this folder. Run `npm run export:payments` to create `data/payments.xlsx` locally. Keep the workbook private and back it up securely.
+Also configure the Razorpay variables shown in `.env.example`. `VITE_RAZORPAY_KEY_ID` is public; do not add `VITE_` to the Razorpay secret or Firebase credentials. Redeploy after changing Vercel variables.
 
-For local development, the Express API writes verified receipts directly to `data/payments.xlsx`. The workbook includes customer name, email, phone, amount, order/payment IDs, and verification time; it does not contain card or bank details. WhatsApp notifications are not configured.
+The backend uses Firebase Admin, so browser clients do not access Firestore directly. `firestore.rules` denies direct client reads and writes. The server account needs Firestore access.
+
+## Firestore collections
+
+- `bookings`: payment/order IDs, booking ID, registered email and phone, payment and registration statuses, attendee limit/count, event name, and status history.
+- `attendees`: attendee name, booking ID, and attendee number.
+- `tickets`: SHA-256 QR token hash, attendee ID, booking ID, and check-in status. The raw QR token is returned to the customer once and is not stored in Firestore.
+- `system/bookingCounter`: transaction-protected booking ID sequence.
+
+Bookings transition from `PAYMENT_PENDING` to `PAID`, then `REGISTRATION_COMPLETED` and `TICKETS_ISSUED`. Payment verification requires the Razorpay signature and matching unguessable registration token. Attendee creation and ticket issuance happen in one Firestore transaction, enforce the booking's attendee limit, and cannot issue duplicate tickets.
+
+## API routes
+
+- `POST /api/create-order` — creates a Razorpay order and `PAYMENT_PENDING` booking.
+- `POST /api/verify-payment` — verifies the Razorpay signature and marks the booking paid.
+- `POST /api/register-attendees` — saves attendees and issues QR tickets for a verified booking.
+
+The local Express server supports these routes during development. Vercel deploys the `api/` handlers as serverless functions.
